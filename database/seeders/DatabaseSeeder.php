@@ -25,6 +25,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             ContentPageSeeder::class,
             NoticeSeeder::class,
+            SiteSettingSeeder::class,
+            MediaAssetSeeder::class,
         ]);
     }
 }

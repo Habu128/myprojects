@@ -1,7 +1,8 @@
+@php($siteLogo = \App\Models\SiteSetting::value('logo_path', 'images/borno-state-logo.png'))
 <div class="utility-bar" id="top">
     <div class="page-wrap utility-inner">
         <span><i class="status-dot"></i> Shani Local Government Area</span>
-        <a class="utility-state" href="https://bornostate.gov.ng/" target="_blank" rel="noopener noreferrer"><img class="state-mark" src="{{ asset('images/borno-state-logo.png') }}" alt="Borno State Government logo"> Borno State, Nigeria</a>
+        <a class="utility-state" href="https://bornostate.gov.ng/" target="_blank" rel="noopener noreferrer"><img class="state-mark" src="{{ \App\Models\MediaAsset::urlFor($siteLogo) }}" alt="Borno State Government logo"> Borno State, Nigeria</a>
         <a href="{{ route('contact') }}">Contact information <span aria-hidden="true">↗</span></a>
     </div>
 </div>
@@ -18,6 +19,11 @@
         <a href="{{ route('transparency') }}" @if (request()->routeIs('transparency')) aria-current="page" @endif>Transparency</a>
         <a href="{{ route('updates') }}" @if (request()->routeIs('updates')) aria-current="page" @endif>News & notices</a>
         <a href="{{ route('contact') }}" @if (request()->routeIs('contact')) aria-current="page" @endif>Contact</a>
+        @auth
+            @if (auth()->user()->is_council_staff)
+                <a href="{{ route('admin.dashboard') }}">Admin panel</a>
+            @endif
+        @endauth
     </nav>
     <a class="header-cta" href="{{ route('home') }}#assistant">Find information <span aria-hidden="true">↗</span></a>
     <details class="mobile-menu">
@@ -32,6 +38,11 @@
             <a href="{{ route('updates') }}" @if (request()->routeIs('updates')) aria-current="page" @endif>News & notices</a>
             <a href="{{ route('feedback') }}" @if (request()->routeIs('feedback', 'feedback.track')) aria-current="page" @endif>Feedback</a>
             <a href="{{ route('contact') }}" @if (request()->routeIs('contact')) aria-current="page" @endif>Contact</a>
+            @auth
+                @if (auth()->user()->is_council_staff)
+                    <a href="{{ route('admin.dashboard') }}">Admin panel</a>
+                @endif
+            @endauth
         </nav>
     </details>
 </header>

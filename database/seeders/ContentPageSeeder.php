@@ -98,6 +98,25 @@ class ContentPageSeeder extends Seeder
                 ],
                 'sources' => [],
             ],
+            'transparency' => [
+                'path' => '/transparency',
+                'eyebrow' => 'PUBLIC RECORDS',
+                'title' => 'Budgets, projects and public records',
+                'description' => 'Links to published budget and audit records, together with BudgIT’s assessment of local government budget transparency.',
+                'details' => 'The 2025 figures are historical budget estimates, not current spending data. BudgIT’s report is an independent transparency assessment, not a government audit. Use the latest available budgets and audited accounts, and label any project status with its source and update date.',
+                'items' => [
+                    ['title' => 'Shani in the 2025 budget', 'description' => 'Open Borno’s published 27 LGA budget document and search for “208327” or “SHANI” to find Shani’s budget tables and listed capital projects.', 'url' => 'https://pfm.bo.gov.ng/wp-content/uploads/Borno-State-27-LG-Budget-Publication.pdf', 'link_text' => 'Open the 2025 LGA budget', 'icon' => '₦'],
+                    ['title' => 'Shani project updates', 'description' => 'Browse projects published by authorized council staff, including their ward, budget, status, source and latest progress evidence.', 'route' => 'projects', 'link_text' => 'View Shani projects', 'icon' => '⌖'],
+                    ['title' => 'Track wider public projects', 'description' => 'BudgIT’s Tracka lets residents explore and monitor public projects. Project status should be checked against dated evidence and official records.', 'url' => 'https://tracka.org/', 'link_text' => 'Visit Tracka', 'icon' => '↗'],
+                    ['title' => 'Audited accounts', 'description' => 'Borno’s finance portal lists consolidated audited statements for local governments, including the 2024 financial year.', 'url' => 'https://pfm.bo.gov.ng/lg-audit-report/', 'link_text' => 'Browse LGA audit reports', 'icon' => '▧'],
+                ],
+                'sources' => [
+                    ['title' => 'BudgIT: The Missing Tier — Mapping Local Government Budget Transparency in Nigeria (2026)', 'url' => 'https://budgit.org/wp-content/uploads/2026/03/The-Missing-Tier.pdf'],
+                    ['title' => 'BudgIT: LG Alert and local government allocations', 'url' => 'https://budgit.org/our_programs/lg-alert/'],
+                    ['title' => 'BudgIT: MyBudgIT — budgets, allocations, and local projects', 'url' => 'https://budgit.org/our_programs/mybudgit/'],
+                    ['title' => 'Borno State PFM: budget publications', 'url' => 'https://pfm.bo.gov.ng/budgets/'],
+                ],
+            ],
             'updates' => [
                 'path' => '/news',
                 'eyebrow' => 'FROM THE COUNCIL',

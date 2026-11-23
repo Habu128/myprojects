@@ -90,8 +90,9 @@ const wardMaps = document.querySelectorAll('[data-ward-map]');
 
 if (wardMaps.length > 0) {
     const svgNamespace = 'http://www.w3.org/2000/svg';
-    const otherWardFill = '#c8ddc2';
-    const shaniWardFill = '#28764b';
+    const themeStyles = getComputedStyle(document.documentElement);
+    const otherWardFill = themeStyles.getPropertyValue('--ward-other').trim() || '#c4e5d1';
+    const shaniWardFill = themeStyles.getPropertyValue('--green').trim() || '#008753';
 
     const createSvgElement = (tagName, attributes = {}) => {
         const element = document.createElementNS(svgNamespace, tagName);
@@ -192,7 +193,16 @@ if (wardMaps.length > 0) {
         return wards.find((ward) => ward.rings.some((ring) => isPointInsideRing(point, ring))) ?? null;
     };
 
-    const renderWardMap = (wardMap, features, assets) => {
+    const renderWardMap = (wardMap, data) => {
+        const features = data.boundaries ?? [];
+        const assets = {
+            homes: data.homes ?? [],
+            schools: data.schools ?? [],
+            health: data.health ?? [],
+        };
+        const unavailable = data.unavailable ?? [];
+        const updatedAt = data.fetched_at ? new Date(data.fetched_at) : null;
+        const updatedNote = updatedAt && ! Number.isNaN(updatedAt.getTime()) ? ` · data updated ${updatedAt.toLocaleDateString()}` : '';
         const mapSvg = wardMap.querySelector('.ward-map-svg');
         const mapStatus = wardMap.querySelector('[data-map-status]');
         const selectionStatus = wardMap.querySelector('[data-map-selected]');
@@ -282,8 +292,8 @@ if (wardMaps.length > 0) {
             selectedWardName = wardName;
             const counts = wardCounts.get(wardName) ?? { homes: 0, schools: 0, health: 0 };
             const summary = `${wardName} Ward · ${counts.homes} mapped homes · ${counts.schools} schools · ${counts.health} primary health ${counts.health === 1 ? 'facility' : 'facilities'}`;
-            const unavailableNote = assets.unavailable.length > 0 ? ` · ${assets.unavailable.join(', ')} unavailable` : '';
-            mapStatus.textContent = detail ? `${detail} · ${wardName} Ward` : `${summary}${unavailableNote}`;
+            const unavailableNote = unavailable.length > 0 ? ` · ${unavailable.join(', ')} unavailable` : '';
+            mapStatus.textContent = detail ? `${detail} · ${wardName} Ward` : `${summary}${unavailableNote}${updatedNote}`;
 
             const selectedWard = wards.find((ward) => (ward.attributes.wardname ?? ward.attributes.WARDNAME ?? 'Ward') === wardName);
             const wardPoints = selectedWard?.rings.flat() ?? [];
@@ -431,106 +441,30 @@ if (wardMaps.length > 0) {
         const totalSchools = [...wardCounts.values()].reduce((sum, counts) => sum + counts.schools, 0);
         const totalHealth = [...wardCounts.values()].reduce((sum, counts) => sum + counts.health, 0);
         const totalFacilities = totalSchools + totalHealth;
-        mapStatus.textContent = `${wards.length} wards · ${totalHomes} mapped homes · ${totalFacilities} facilities`;
+        mapStatus.textContent = `${wards.length} wards · ${totalHomes} mapped homes · ${totalFacilities} facilities${updatedNote}`;
 
         selectWard(selectedWardName);
     };
 
-    const loadArcGisFeatures = async (layerUrl, where, outFields) => {
-        const query = new URLSearchParams({
-            where,
-            outFields,
-            returnGeometry: 'true',
-            outSR: '4326',
-            f: 'geojson',
-        });
-        const response = await fetch(`${layerUrl}/query?${query}`);
+    const mapDataUrl = wardMaps[0].dataset.mapDataUrl;
 
-        if (!response.ok) {
-            throw new Error('The map data could not be loaded.');
-        }
+    if (mapDataUrl) {
+        fetch(mapDataUrl, { headers: { Accept: 'application/json' } })
+            .then((response) => {
+                if (!response.ok) {
+                    throw new Error('The ward map data could not be loaded.');
+                }
 
-        const result = await response.json();
-
-        if (result.error) {
-            throw new Error('The map data is temporarily unavailable.');
-        }
-
-        return result.features ?? [];
-    };
-
-    const loadWardBoundaries = async () => {
-        const features = await loadArcGisFeatures(
-            'https://services1.arcgis.com/XBhYkoXKJCRHbe7M/ArcGIS/rest/services/NGA_Ward_Boundaries/FeatureServer/0',
-            "UPPER(lganame)='SHANI' AND UPPER(statename)='BORNO'",
-            'wardname,wardcode,lganame,statename',
-        );
-
-        if (features.length === 0) {
-            throw new Error('No Shani ward boundaries were returned.');
-        }
-
-        return features;
-    };
-
-    const getBoundaryBounds = (features) => {
-        const points = features.flatMap((feature) => getOuterRings(feature).flat());
-        const longitudes = points.map(([longitude]) => longitude);
-        const latitudes = points.map(([, latitude]) => latitude);
-
-        return {
-            west: Math.min(...longitudes),
-            south: Math.min(...latitudes),
-            east: Math.max(...longitudes),
-            north: Math.max(...latitudes),
-        };
-    };
-
-    const loadHomes = async (features) => {
-        const bounds = getBoundaryBounds(features);
-        const query = `[out:json][timeout:25];way["building"~"^(house|residential|detached|semidetached_house|bungalow|apartments)$"](${bounds.south},${bounds.west},${bounds.north},${bounds.east});out center tags;`;
-        const response = await fetch(`https://overpass-api.de/api/interpreter?data=${encodeURIComponent(query)}`);
-
-        if (!response.ok) {
-            throw new Error('Mapped home locations could not be loaded.');
-        }
-
-        const result = await response.json();
-
-        return (result.elements ?? []).map((element) => ({
-            lat: element.center?.lat ?? element.lat,
-            lon: element.center?.lon ?? element.lon,
-            tags: element.tags ?? {},
-        }));
-    };
-
-    const loadWardAssets = async (boundaryFeatures) => {
-        const schoolLayer = 'https://services3.arcgis.com/BU6Aadhn6tbBEdyk/arcgis/rest/services/Schools_in_Nigeria/FeatureServer/0';
-        const healthLayer = 'https://services3.arcgis.com/9nfxWATFamVUTTGb/ArcGIS/rest/services/health_facilities_state_WFL1/FeatureServer/1';
-        const settled = await Promise.allSettled([
-            loadArcGisFeatures(schoolLayer, "UPPER(lganame)='SHANI' AND UPPER(statename)='BORNO'", 'name,wardname,poi_type,education,management,category,subtype'),
-            loadArcGisFeatures(healthLayer, "UPPER(lga)='SHANI' AND UPPER(state)='BORNO' AND UPPER(facility_l)='PRIMARY'", 'facility_n,facility_1,facility_2,facility_l,ownership,ward,latitude,longitude,last_updat'),
-            loadHomes(boundaryFeatures),
-        ]);
-
-        const unavailable = settled.flatMap((result, index) => result.status === 'rejected' ? [['schools', 'primary health facilities', 'mapped homes'][index]] : []);
-
-        return {
-            schools: settled[0].status === 'fulfilled' ? settled[0].value : [],
-            health: settled[1].status === 'fulfilled' ? settled[1].value : [],
-            homes: settled[2].status === 'fulfilled' ? settled[2].value : [],
-            unavailable,
-        };
-    };
-
-    loadWardBoundaries().then((features) => {
-        return loadWardAssets(features).then((assets) => {
-            wardMaps.forEach((wardMap) => renderWardMap(wardMap, features, assets));
-        });
-    }).catch(() => {
-        wardMaps.forEach((wardMap) => {
-            const mapStatus = wardMap.querySelector('[data-map-status]');
-            mapStatus.textContent = 'Ward map unavailable. Please try again later.';
-        });
-    });
+                return response.json();
+            })
+            .then((data) => {
+                wardMaps.forEach((wardMap) => renderWardMap(wardMap, data));
+            })
+            .catch(() => {
+                wardMaps.forEach((wardMap) => {
+                    const mapStatus = wardMap.querySelector('[data-map-status]');
+                    mapStatus.textContent = 'Ward map unavailable. Please try again later.';
+                });
+            });
+    }
 }

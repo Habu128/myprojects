@@ -38,6 +38,11 @@ class WardMapDataService
         return $data;
     }
 
+    public function clearCache(): void
+    {
+        Cache::forget(self::CACHE_KEY);
+    }
+
     /**
      * @return array{boundaries: array<int, array<string, mixed>>, homes: array<int, array<string, mixed>>, schools: array<int, array<string, mixed>>, health: array<int, array<string, mixed>>, unavailable: array<int, string>, fetched_at: string, stale: bool}
      */

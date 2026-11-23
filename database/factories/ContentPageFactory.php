@@ -2,10 +2,11 @@
 
 namespace Database\Factories;
 
+use App\Models\ContentPage;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
- * @extends \Illuminate\Database\Eloquent\Factories\Factory<\App\Models\ContentPage>
+ * @extends Factory<ContentPage>
  */
 class ContentPageFactory extends Factory
 {

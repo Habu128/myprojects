@@ -30,7 +30,7 @@ class CouncilReportsController extends Controller
 
         $request->session()->regenerate();
 
-        return to_route('council.reports.index');
+        return to_route('admin.dashboard');
     }
 
     public function index(): View

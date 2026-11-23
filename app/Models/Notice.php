@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
+use Carbon\CarbonInterface;
 use Database\Factories\NoticeFactory;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Support\Carbon;
 
 class Notice extends Model
 {
@@ -27,7 +28,18 @@ class Notice extends Model
         ];
     }
 
-    public function publishedDate(): Carbon
+    /**
+     * @param  Builder<Notice>  $query
+     */
+    public function scopePublished(Builder $query): void
+    {
+        $query->where('is_published', true)
+            ->where(function (Builder $query): void {
+                $query->whereNull('published_at')->orWhere('published_at', '<=', now());
+            });
+    }
+
+    public function publishedDate(): CarbonInterface
     {
         return $this->published_at ?? $this->created_at;
     }

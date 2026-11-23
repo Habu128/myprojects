@@ -12,7 +12,7 @@
     <main class="content-page page-wrap">
         <div class="eyebrow"><span class="eyebrow-dot"></span> COUNCIL STAFF</div>
         <h1>Staff sign in</h1>
-        <p class="content-page-lead">Authorized staff can review resident reports and publish status updates.</p>
+        <p class="content-page-lead">Authorized staff can open the admin dashboard to manage pages, notices, projects, uploads and resident reports.</p>
         <form class="feedback-form staff-login-form" method="post" action="{{ route('council.reports.authenticate') }}">
             @csrf
             <div class="feedback-fields">

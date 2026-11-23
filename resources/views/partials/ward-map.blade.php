@@ -1,7 +1,7 @@
 <div>
     <!-- It is never too late to be what you might have been. - George Eliot -->
 </div>
-<div class="ward-map {{ $mapClass ?? '' }}" data-ward-map data-map-id="{{ $mapId }}" role="group" aria-label="Interactive map of Shani Local Government Area and its wards">
+<div class="ward-map {{ $mapClass ?? '' }}" data-ward-map data-map-id="{{ $mapId }}" data-map-data-url="{{ route('map.data') }}" role="group" aria-label="Interactive map of Shani Local Government Area and its wards">
     <div class="hero-visual ward-map-canvas">
         <div class="ward-map-heading"><span class="map-heading-dot"></span><span>SHANI LGA <small>WARD MAP</small></span></div>
         <div class="ward-map-status" data-map-status role="status" aria-live="polite">Loading ward locations…</div>
