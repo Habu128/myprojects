@@ -63,6 +63,23 @@ test('council staff can upload a media asset', function () {
         ->assertSee('Uploaded chairman portrait');
 });
 
+test('media uploads use the configured media disk', function () {
+    config()->set('filesystems.media_disk', 's3');
+    Storage::fake('s3');
+
+    $this->actingAs(councilStaff())->post(route('admin.media.store'), [
+        'title' => 'Cloud-stored upload',
+        'alt_text' => 'Upload stored on the configured disk',
+        'category' => 'general',
+        'file' => UploadedFile::fake()->image('cloud-upload.png', 600, 400),
+    ])->assertRedirect(route('admin.media.index'));
+
+    $asset = MediaAsset::query()->firstOrFail();
+
+    Storage::disk('s3')->assertExists($asset->path);
+    Storage::disk('public')->assertMissing($asset->path);
+});
+
 test('site settings update what visitors see', function () {
     ContentPage::factory()->create([
         'slug' => 'contact',

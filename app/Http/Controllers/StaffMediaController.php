@@ -37,7 +37,7 @@ class StaffMediaController extends AdminController
             'file' => ['required', 'file', 'image', 'mimes:jpg,jpeg,png,webp', 'max:4096'],
         ]);
 
-        $path = $request->file('file')->store('media', 'public');
+        $path = $request->file('file')->store('media', MediaAsset::disk());
 
         MediaAsset::query()->create([
             'title' => $validated['title'],
@@ -72,7 +72,7 @@ class StaffMediaController extends AdminController
         abort_if($mediaAsset->path === SiteSetting::value('logo_path'), 422, 'This image is currently used as the site logo.');
 
         if ($mediaAsset->isStoredFile()) {
-            Storage::disk('public')->delete($mediaAsset->path);
+            Storage::disk(MediaAsset::disk())->delete($mediaAsset->path);
         }
 
         $mediaAsset->delete();

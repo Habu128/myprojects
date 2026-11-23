@@ -17,6 +17,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Public Media Disk
+    |--------------------------------------------------------------------------
+    |
+    | Admin uploads use this disk so production can point media at object
+    | storage without changing application code. Local development keeps
+    | using the "public" disk.
+    |
+    */
+
+    'media_disk' => env('MEDIA_DISK', 'public'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Filesystem Disks
     |--------------------------------------------------------------------------
     |

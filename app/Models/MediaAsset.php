@@ -37,7 +37,12 @@ class MediaAsset extends Model
             return asset($path);
         }
 
-        return Storage::disk('public')->url($path);
+        return Storage::disk(self::disk())->url($path);
+    }
+
+    public static function disk(): string
+    {
+        return (string) config('filesystems.media_disk', 'public');
     }
 
     public function isStoredFile(): bool
