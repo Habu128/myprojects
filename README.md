@@ -16,7 +16,7 @@ The site publishes sourced information about Shani LGA, its wards, services, pub
 
 ## Tech stack
 
-- PHP 8.4
+- PHP 8.4.1 or later
 - Laravel 13
 - Livewire 4
 - Tailwind CSS 4 / Vite

@@ -13,8 +13,13 @@ class EnquiryController extends Controller
 {
     public function index(Request $request): JsonResponse
     {
+        $filters = $request->validate([
+            'status' => ['sometimes', 'nullable', 'in:new,in_review,resolved,closed'],
+            'search' => ['sometimes', 'nullable', 'string', 'max:100'],
+        ]);
+
         $enquiries = $this->enquiryService->getAll(
-            $request->only(['status', 'search'])
+            $filters,
         );
 
         return response()->json([
@@ -42,21 +47,29 @@ class EnquiryController extends Controller
     public function show(Enquiry $enquiry): JsonResponse
     {
         return response()->json([
-            'message' => 'show enquiry data.',
+            'message' => 'Enquiry retrieved successfully.',
+            'data' => $enquiry,
         ]);
     }
 
-    public function update(StoreEnquiryRequest $request, Enquiry $enquiry): JsonResponse
+    public function update(Request $request, Enquiry $enquiry): JsonResponse
     {
+        $validated = $request->validate([
+            'status' => ['required', 'in:new,in_review,resolved,closed'],
+        ]);
+
+        $enquiry->update($validated);
+
         return response()->json([
-            'message' => 'updated successfully.',
+            'message' => 'Enquiry updated successfully.',
+            'data' => $enquiry->fresh(),
         ]);
     }
 
     public function destroy(Enquiry $enquiry): JsonResponse
     {
-        return response()->json([
-            'message' => 'enquiry deleted successfully.',
-        ]);
+        $enquiry->delete();
+
+        return response()->json(null, 204);
     }
 }

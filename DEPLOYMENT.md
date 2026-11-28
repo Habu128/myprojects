@@ -1,6 +1,6 @@
 # Deployment checklist
 
-This application is Laravel 13 on PHP 8.4. The recommended deployment target is [Laravel Cloud](https://cloud.laravel.com/).
+This application is Laravel 13 and requires PHP 8.4.1 or later. The recommended deployment target is [Laravel Cloud](https://cloud.laravel.com/).
 
 ## 1. Prepare the repository
 
@@ -30,7 +30,7 @@ Both `composer.lock` and `package-lock.json` are committed and must stay committ
 4. Choose a region close to Shani/Borno State users.
 5. Create the application.
 
-In **General Settings**, set the PHP runtime to **PHP 8.4**.
+In **General Settings**, set the PHP runtime to **PHP 8.4.1 or later**.
 
 ## 3. Attach a database
 

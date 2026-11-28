@@ -7,6 +7,7 @@ use Database\Factories\NoticeFactory;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
 
 class Notice extends Model
 {
@@ -41,6 +42,10 @@ class Notice extends Model
 
     public function publishedDate(): CarbonInterface
     {
-        return $this->published_at ?? $this->created_at;
+        $date = $this->published_at ?? $this->created_at;
+
+        return $date instanceof CarbonInterface
+            ? $date
+            : Carbon::parse($date ?? now());
     }
 }

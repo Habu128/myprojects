@@ -171,6 +171,11 @@ class WardMapDataService
 
         $longitudes = array_column($coordinates, 0);
         $latitudes = array_column($coordinates, 1);
+
+        if ($latitudes === [] || $longitudes === []) {
+            throw new RuntimeException('No valid ward coordinates were available for the homes query.');
+        }
+
         $query = sprintf(
             '[out:json][timeout:25];way["building"~"^(house|residential|detached|semidetached_house|bungalow|apartments)$"](%s,%s,%s,%s);out center tags;',
             min($latitudes),

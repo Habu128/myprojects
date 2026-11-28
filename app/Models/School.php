@@ -14,11 +14,13 @@ class School extends Model
         'address',
     ];
 
+    /** @return HasMany<User, $this> */
     public function users(): HasMany
     {
         return $this->hasMany(User::class);
     }
 
+    /** @return HasMany<Enquiry, $this> */
     public function enquiries(): HasMany
     {
         return $this->hasMany(Enquiry::class);

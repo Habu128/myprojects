@@ -8,11 +8,16 @@ use Illuminate\Database\Eloquent\Builder;
 
 class EnquiryService
 {
+    /** @param array<string, mixed> $data */
     public function create(array $data): Enquiry
     {
         return Enquiry::create($data);
     }
 
+    /**
+     * @param  array{status?: string|null, search?: string|null}  $filters
+     * @return LengthAwarePaginator<int, Enquiry>
+     */
     public function getAll(array $filters = []): LengthAwarePaginator
     {
         return Enquiry::query()

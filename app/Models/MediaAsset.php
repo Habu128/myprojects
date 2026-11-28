@@ -21,6 +21,7 @@ class MediaAsset extends Model
         'uploaded_by',
     ];
 
+    /** @return BelongsTo<User, $this> */
     public function uploader(): BelongsTo
     {
         return $this->belongsTo(User::class, 'uploaded_by');

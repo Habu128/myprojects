@@ -42,8 +42,50 @@ class ContentPage extends Model
             'title' => $this->title,
             'description' => $this->description,
             'details' => $this->details ?? '',
-            'items' => $this->items ?? [],
-            'sources' => $this->sources ?? [],
+            'items' => $this->normalizeItems($this->items),
+            'sources' => $this->normalizeSources($this->sources),
         ];
+    }
+
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function normalizeItems(mixed $items): array
+    {
+        if (! is_array($items)) {
+            return [];
+        }
+
+        return array_values(array_filter($items, 'is_array'));
+    }
+
+    /**
+     * @return array<int, array<string, string>>
+     */
+    private function normalizeSources(mixed $sources): array
+    {
+        if (! is_array($sources)) {
+            return [];
+        }
+
+        $normalized = [];
+
+        foreach ($sources as $source) {
+            if (! is_array($source)) {
+                continue;
+            }
+
+            $normalizedSource = [];
+
+            foreach ($source as $key => $value) {
+                if (is_string($key) && is_string($value)) {
+                    $normalizedSource[$key] = $value;
+                }
+            }
+
+            $normalized[] = $normalizedSource;
+        }
+
+        return $normalized;
     }
 }
